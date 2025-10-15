@@ -66,6 +66,8 @@ CONSTRAINT chk_unit_price CHECK (unit_price > 0)
 INSERT INTO products VALUES (1, 'Ultrabook Pro 14', 'Laptop', '14-inch ultrabook, 16GB RAM, 512GB SSD', 89999, 25, SYSDATE);
 INSERT INTO products VALUES (2, 'AeroSound Wireless', 'Headphones', 'Over-ear noise-cancelling Bluetooth headset', 7999, 15, SYSDATE);
 INSERT INTO products VALUES (3, 'FastCharge 65W', 'Charger', 'USB-C PD 65W fast charger', 1999, 50, SYSDATE);
+INSERT INTO products VALUES (4, 'Iphone 14', 'Mobile', '14-inch, 16GB RAM, 512GB SSD', 89999, 25, SYSDATE);
+INSERT INTO products VALUES (5, 'Aero Wireless', 'Headphones', 'Bluetooth headset', 7999, 15, SYSDATE);
 
 -- -- CUSTOMERS
 INSERT INTO customers VALUES (100, 'Reha', 'Mittal', 'reha.mittal@example.com', '+91-980000000', SYSDATE);
@@ -74,9 +76,10 @@ INSERT INTO customers VALUES (101, 'Mishti', 'Sharma', 'mishti.sharma@example.co
 -- ORDERS
 INSERT INTO orders (order_id, customer_id, total_amount, status)
 VALUES (1, 100, 0, 'PLACED');
-
 INSERT INTO orders (order_id, customer_id, total_amount, status)
 VALUES (2, 101, 0, 'PLACED');
+INSERT INTO orders (order_id, customer_id, total_amount, status) VALUES (3, 101, 1272, 'PLACED');
+INSERT INTO orders (order_id, customer_id, total_amount, status) VALUES (4, 100, 12377, 'PLACED');
 
 -- ORDER DETAILS
 INSERT INTO orderdetails VALUES (1, 1, 1, 1, 89999);  
@@ -84,3 +87,23 @@ INSERT INTO orderdetails VALUES (2, 1, 3, 2, 1999);
 INSERT INTO orderdetails VALUES (3, 2, 2, 2, 7999);
 
 COMMIT;
+
+--Q1. 
+SELECT product_name,stock
+FROM products
+WHERE stock < 20;
+
+--Q2.
+SELECT c.customer_id, c.first_name || ' ' || c.last_name AS customer_name,SUM(o.total_amount) AS total_spent
+FROM customers c
+JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_spent DESC;
+
+--Q3. 
+UPDATE products p
+SET stock = stock - (
+SELECT SUM(od.quantity)
+FROM orderdetails od
+WHERE od.product_id = p.product_id );
